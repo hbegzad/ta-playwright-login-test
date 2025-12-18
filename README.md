@@ -5,8 +5,9 @@ Automated UI testing for the Login features of a web application using [Playwrig
 ## Precondition
 
 **GitHub**
-Sign up for an account (if does not have one)
-Create the repository
+
+- Sign up for an account (if does not have one)
+- Create the repository
 
 **SSH access**
 
