@@ -1,27 +1,90 @@
 name: Playwright Tests
 on:
+  workflow_dispatch:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+env:
+  CI: true
 jobs:
-  test:
-    timeout-minutes: 60
+  # Code quality - run ESLint
+  lint:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Run ESLint
+      run: npm run lint
+  
+  # Test on staging environment (manual trigger only)
+  test-staging:
+    needs: lint
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment:
+      name: staging
+      url: https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
+    env:
+      TEST_ENV: staging
+      BASE_URL: ${{ vars.BASE_URL }}
+      TEST_USER_USERNAME: ${{ secrets.TEST_USER_USERNAME }}
+      TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        cache: 'npm'
     - name: Install dependencies
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      run: npx playwright test
+      run: npx playwright test --project=chromium
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
-        name: playwright-report
-        path: playwright-report/
+        name: reports-staging
+        path: reports/
+        retention-days: 30
+  
+  # Test on development environment (manual trigger only)
+  test-development:
+    needs: lint
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment:
+      name: development
+      url: https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
+    env:
+      TEST_ENV: development
+      BASE_URL: ${{ vars.BASE_URL }}
+      TEST_USER_USERNAME: ${{ secrets.TEST_USER_USERNAME }}
+      TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Run Playwright tests
+      run: npx playwright test --project=firefox
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: reports-development
+        path: reports/
         retention-days: 30
