@@ -1,9 +1,25 @@
 {
   "name": "ta-playwright-login-test",
   "version": "1.0.0",
-  "description": "",
+  "description": "Playwright UI tests demo for login functionality of a web application.",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "npx playwright test",
+    "test:login": "npx playwright test tests/login.spec.ts",
+    "test:staging": "TEST_ENV=staging npx playwright test",
+    "test:staging:login": "TEST_ENV=staging npx playwright test tests/login.spec.ts",
+    "test:dev": "TEST_ENV=development npx playwright test",
+    "test:dev:login": "TEST_ENV=development npx playwright test tests/login.spec.ts",
+    "test:chromium": "npx playwright test --project=chromium",
+    "test:firefox": "npx playwright test --project=firefox",
+    "test:webkit": "npx playwright test --project=webkit",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "test:ui": "npx playwright test --ui",
+    "report": "npx playwright show-report",
+    "lint": "npx eslint . --ext .ts",
+    "lint:fix": "npx eslint . --fix"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hbegzad/ta-playwright-login-test.git"
@@ -15,9 +31,15 @@
     "url": "https://github.com/hbegzad/ta-playwright-login-test/issues"
   },
   "homepage": "https://github.com/hbegzad/ta-playwright-login-test#readme",
-  "dependencies": {
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@playwright/test": "^1.57.0",
     "@types/node": "^25.0.3",
-    "dotenv": "^17.2.3"
+    "@typescript-eslint/eslint-plugin": "^8.50.0",
+    "@typescript-eslint/parser": "^8.50.0",
+    "dotenv": "^16.6.1",
+    "eslint": "^9.39.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.0"
   }
 }
