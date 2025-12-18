@@ -1,6 +1,15 @@
 name: Playwright Tests
 on:
   workflow_dispatch:
+    inputs:
+      target_env:
+        description: 'Environment to test (staging, development, all)'
+        required: false
+        default: 'all'
+      browser:
+        description: 'Browser to run (chromium, firefox, webkit)'
+        required: false
+        default: ''
   push:
     branches: [ main, master ]
   pull_request:
@@ -26,7 +35,7 @@ jobs:
   # Test on staging environment (manual trigger only)
   test-staging:
     needs: lint
-    if: github.event_name == 'workflow_dispatch'
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.target_env == 'all' || github.event.inputs.target_env == 'staging' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     environment:
@@ -48,7 +57,12 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      run: npx playwright test --project=chromium
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.browser }}" != "" ]; then
+          npx playwright test --project=${{ github.event.inputs.browser }}
+        else
+          npx playwright test --project=chromium
+        fi
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
@@ -59,7 +73,7 @@ jobs:
   # Test on development environment (manual trigger only)
   test-development:
     needs: lint
-    if: github.event_name == 'workflow_dispatch'
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.target_env == 'all' || github.event.inputs.target_env == 'development' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     environment:
@@ -81,7 +95,12 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      run: npx playwright test --project=firefox
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.browser }}" != "" ]; then
+          npx playwright test --project=${{ github.event.inputs.browser }}
+        else
+          npx playwright test --project=firefox
+        fi
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
