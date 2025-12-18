@@ -1,0 +1,12 @@
+<testsuites id="" name="" tests="4" failures="0" skipped="0" errors="0" time="16.304019">
+<testsuite name="login.spec.ts" timestamp="2025-12-18T04:50:55.700Z" hostname="firefox" tests="4" failures="0" skipped="0" time="20.947" errors="0">
+<testcase name="Login Page › Successful Login › user can login with valid credentials" classname="login.spec.ts" time="7.75">
+</testcase>
+<testcase name="Login Page › Error Handling › displays error for invalid credentials" classname="login.spec.ts" time="7.162">
+</testcase>
+<testcase name="Login Page › Error Handling › displays error for empty fields" classname="login.spec.ts" time="2.611">
+</testcase>
+<testcase name="Login Page › Forgot Password › displays Forgot Password page when clicking the link" classname="login.spec.ts" time="3.424">
+</testcase>
+</testsuite>
+</testsuites>
