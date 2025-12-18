@@ -6,8 +6,9 @@ export class LoginPage {
   readonly inUsername: Locator;
   readonly inPassword: Locator;
   readonly btnLogin: Locator;
-  readonly lnkForgotLoginInfo: Locator;
+  readonly lnkForgotPassword: Locator;
   readonly txtErrorMessage: Locator;
+  readonly txtErrorRequiredField: Locator;
 
   // URL patterns
   readonly reForgotPasswordUrl = /reset|password/i;
@@ -17,14 +18,16 @@ export class LoginPage {
     // Locators - update selectors based on actual page structure
     this.inUsername = page.locator('input[name="username"]');
     this.inPassword = page.locator('input[name="password"]');
-    this.btnLogin = page.locator('.button').or(page.locator('button[type="submit"]'));
-    this.lnkForgotLoginInfo = page.locator('a[href*="lookup.htm"]');
-    this.txtErrorMessage = page.locator('.error');
+    this.btnLogin = page.locator('button[type="submit"]');
+    this.lnkForgotPassword = page.locator('//div[@class="orangehrm-login-forgot"]/p');
+    //this.txtErrorMessage = page.locator('//p[@class="oxd-text oxd-text--p oxd-alert-content-text"]');
+    this.txtErrorMessage = page.getByText('Invalid credentials');
+    this.txtErrorRequiredField = page.getByText('Required').first();
   }
 
   // Navigate to login page
   async goto() {
-    await this.page.goto(process.env.BASE_URL || 'https://parabank.parasoft.com/parabank/login.htm');
+    await this.page.goto(process.env.BASE_URL || 'https://opensource-demo.orangehrmlive.com/web/index.php/auth/login');
   }
 
   // Fill username field
@@ -46,11 +49,16 @@ export class LoginPage {
 
   // Click forgot password link
   async clickForgotPassword() {
-    await this.lnkForgotLoginInfo.click();
+    await this.lnkForgotPassword.click();
   }
 
   // Get error message text
   async getErrorMessageText(): Promise<string> {
     return await this.txtErrorMessage.textContent() || '';
+  }
+
+  // Get Required Field message text
+  async getErrorRequiredFieldText(): Promise<string> {
+    return await this.txtErrorRequiredField.textContent() || '';
   }
 }
