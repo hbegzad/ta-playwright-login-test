@@ -31,10 +31,29 @@ jobs:
       run: npm ci
     - name: Run ESLint
       run: npm run lint
-  
+
+  # Smoke tests
+  smoke:
+    needs: lint
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run smoke tests
+        # This command runs only tests marked with @smoke
+        run: npx playwright test --grep "@smoke" --project=chromium
+
   # Test on staging environment (manual trigger only)
   test-staging:
-    needs: lint
+    needs: smoke
     if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.target_env == 'all' || github.event.inputs.target_env == 'staging' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -69,7 +88,7 @@ jobs:
         name: reports-staging
         path: reports/
         retention-days: 30
-  
+
   # Test on development environment (manual trigger only)
   test-development:
     needs: lint
